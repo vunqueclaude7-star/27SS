@@ -191,11 +191,15 @@
   .evalrow-scroll .evalrow-head{margin-left:0;}
   .evalrow-scroll .evalrow-name{font-size:13.5px;min-width:0;}
   .evalrow-scroll .evalrow-price{font-size:12px;white-space:nowrap;}
-  @media (max-width:640px){
+  @media (max-width:900px){
     .evalrow-scroll{grid-template-columns:repeat(2,minmax(0,1fr));}
   }
-  @media (max-width:400px){
-    .evalrow-scroll{grid-template-columns:1fr;}
+  @media (max-width:600px){
+    .evalrow-scroll{grid-template-columns:1fr;gap:10px;}
+    .evalrow-scroll .evalrow{padding:14px;}
+    .evalrow-scroll .evalrow-name{font-size:16px;}
+    .evalrow-scroll .evalrow-price{font-size:14px;}
+    .evalrow-scroll .evalrow-image{max-width:220px;margin:0 auto;}
   }
   .evalrow{display:flex;flex-direction:column;gap:10px;padding:14px 0;border-bottom:1px solid var(--line);}
   .evalrow:first-child{padding-top:0;}
