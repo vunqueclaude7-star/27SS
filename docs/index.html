@@ -177,6 +177,18 @@
   .cat-subhead h3{font-size:15.5px;font-family:"Gothic A1","Malgun Gothic",sans-serif;font-weight:700;}
 
   .evallist{display:flex;flex-direction:column;gap:0;margin-top:10px;}
+  .group-head{display:flex;align-items:baseline;gap:8px;margin:22px 0 2px;padding-top:16px;border-top:2px solid var(--line-strong);}
+  .group-head:first-child{margin-top:0;padding-top:0;border-top:none;}
+  .group-head h3{font-size:16.5px;font-family:"Gothic A1","Malgun Gothic",sans-serif;font-weight:800;}
+  .subgroup-head{display:flex;align-items:baseline;gap:8px;margin:14px 0 8px;}
+  .subgroup-head h4{font-size:13px;color:var(--ink-muted);font-weight:700;}
+  .evalrow-scroll{display:flex;gap:12px;overflow-x:auto;padding-bottom:10px;margin:0 -16px;padding-left:16px;padding-right:16px;}
+  .evalrow-scroll .evalrow{flex:0 0 260px;width:260px;border:1px solid var(--line);border-radius:12px;padding:14px;background:var(--surface-2);}
+  .evalrow-scroll .evalrow:last-child{border-bottom:1px solid var(--line);padding-bottom:14px;}
+  .evalrow-scroll .evalrow-body{flex-direction:column;align-items:stretch;}
+  .evalrow-scroll .evalrow-image{width:100%;max-width:100%;align-self:center;}
+  .evalrow-scroll .evalrow-tags,
+  .evalrow-scroll .evalrow-head{margin-left:0;}
   .evalrow{display:flex;flex-direction:column;gap:10px;padding:14px 0;border-bottom:1px solid var(--line);}
   .evalrow:first-child{padding-top:0;}
   .evalrow:last-child{border-bottom:none;padding-bottom:0;}
@@ -781,10 +793,9 @@
       return;
     }
 
-    html += '<div class="evallist">';
-    list.forEach(function(s, idx){
+    function buildEvalRowHtml(s, idx){
       var ev = evalData[cat][idx];
-      html += '<div class="evalrow">'
+      return '<div class="evalrow">'
         + ((s.description || s.distribution) ? (
             '<div class="evalrow-tags">'
             + (s.description ? '<span class="tag '+descriptionTagClass(s.description)+'">'+escapeHtml(s.description)+'</span>' : '')
@@ -814,7 +825,51 @@
           + '<textarea class="evalrow-comment" data-cat="'+cat+'" data-idx="'+idx+'" placeholder="이 상품에 대한 의견을 적어주세요">'+escapeHtml(ev.comment||"")+'</textarea>'
         + '</label>'
         + '</div>';
+    }
+
+    function distBucket(dist){
+      if (dist === "전체") return "전체";
+      if (dist === "오프라인단독") return "오프라인";
+      if (dist === "무신사단독" || dist === "W컨셉단독" || dist === "29CM단독" || dist === "카카오단독") return "온라인";
+      return "기타";
+    }
+
+    var DESC_GROUPS = ["주력", "아이캐칭", "베이직"];
+    var DIST_BUCKETS = ["전체", "온라인", "오프라인", "기타"];
+    var groups = {};
+    DESC_GROUPS.forEach(function(g){
+      groups[g] = {"전체":[], "온라인":[], "오프라인":[], "기타":[]};
     });
+    var ungrouped = [];
+    list.forEach(function(s, idx){
+      if (DESC_GROUPS.indexOf(s.description) !== -1){
+        groups[s.description][distBucket(s.distribution)].push(idx);
+      } else {
+        ungrouped.push(idx);
+      }
+    });
+
+    function renderSection(title, idxs){
+      var out = '<div class="subgroup-head"><h4>'+escapeHtml(title)+'</h4><span class="cat-count">'+idxs.length+'개</span></div>';
+      out += '<div class="evalrow-scroll">';
+      idxs.forEach(function(idx){ out += buildEvalRowHtml(list[idx], idx); });
+      out += '</div>';
+      return out;
+    }
+
+    html += '<div class="evallist">';
+    DESC_GROUPS.forEach(function(g){
+      var total = DIST_BUCKETS.reduce(function(sum,b){ return sum + groups[g][b].length; }, 0);
+      if (!total) return;
+      html += '<div class="group-head"><h3>'+escapeHtml(g)+'</h3><span class="cat-count">'+total+'개</span></div>';
+      DIST_BUCKETS.forEach(function(b){
+        if (groups[g][b].length) html += renderSection(b, groups[g][b]);
+      });
+    });
+    if (ungrouped.length){
+      html += '<div class="group-head"><h3>기타</h3><span class="cat-count">'+ungrouped.length+'개</span></div>';
+      html += renderSection('전체', ungrouped);
+    }
     html += '</div>';
 
     html += '<div class="cat-subhead"><h3>베스트 순위 선택</h3>'
