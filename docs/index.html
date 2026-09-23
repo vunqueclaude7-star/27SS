@@ -218,6 +218,7 @@
   .tag-purple{color:var(--violet);background:var(--violet-soft);border-color:var(--violet);}
   .tag-neutral{color:var(--ink-muted);background:var(--surface-2);border-color:var(--line-strong);}
   .tag-green{color:var(--good);background:var(--good-soft);border-color:var(--good);}
+  .tag-yellow{color:var(--brass);background:var(--brass-soft);border-color:var(--brass);}
   .evalrow-num{flex:0 0 auto;width:22px;height:22px;border-radius:50%;background:var(--surface-2);border:1px solid var(--line-strong);color:var(--ink-muted);display:flex;align-items:center;justify-content:center;font-family:"IBM Plex Mono",monospace;font-weight:700;font-size:12px;transform:translateY(1px);}
   .evalrow-name{font-weight:600;font-size:17px;}
   .evalrow-price{font-family:"IBM Plex Mono",monospace;font-size:17px;color:var(--accent);font-weight:700;}
@@ -788,7 +789,7 @@
   function descriptionTagClass(value){
     if (value === "주력") return "tag-main";
     if (value === "베이직") return "tag-green";
-    if (value === "아이캐칭") return "tag-neutral";
+    if (value === "아이캐칭") return "tag-yellow";
     return "tag-main";
   }
 
