@@ -178,7 +178,7 @@
 
   .evallist{display:flex;flex-direction:column;gap:0;margin-top:10px;}
   .group-head{margin:26px 0 14px;padding-top:18px;border-top:2px solid var(--line-strong);}
-  .group-head:first-child{margin-top:0;padding-top:0;border-top:none;}
+  .group-head:first-child,.group-head.first{margin-top:0;padding-top:0;border-top:none;}
   .tag.group-badge{
     display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
     width:100%;padding:16px 12px;border-radius:14px;border-width:2px;
@@ -875,16 +875,21 @@
     }
 
     html += '<div class="evallist">';
+    var firstBlockRendered = false;
     DESC_GROUPS.forEach(function(g){
       var total = DIST_BUCKETS.reduce(function(sum,b){ return sum + groups[g][b].length; }, 0);
       if (!total) return;
-      html += '<div class="group-head"><div class="tag group-badge '+descriptionTagClass(g)+'">'+escapeHtml(g)+'<span class="group-badge-count">'+total+'개</span></div></div>';
+      if (g !== "제목없음") {
+        html += '<div class="group-head'+(firstBlockRendered?'':' first')+'"><div class="tag group-badge '+descriptionTagClass(g)+'">'+escapeHtml(g)+'<span class="group-badge-count">'+total+'개</span></div></div>';
+      }
+      firstBlockRendered = true;
       DIST_BUCKETS.forEach(function(b){
         if (groups[g][b].length) html += renderSection(b, groups[g][b]);
       });
     });
     if (ungrouped.length){
-      html += '<div class="group-head"><div class="tag group-badge tag-neutral">기타<span class="group-badge-count">'+ungrouped.length+'개</span></div></div>';
+      html += '<div class="group-head'+(firstBlockRendered?'':' first')+'"><div class="tag group-badge tag-neutral">기타<span class="group-badge-count">'+ungrouped.length+'개</span></div></div>';
+      firstBlockRendered = true;
       html += renderSection('전체', ungrouped);
     }
     html += '</div>';
