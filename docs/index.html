@@ -608,7 +608,8 @@
   var formRanks = {BAG:[], WALLET:[], ACC:[]};
   var evalData = {BAG:[], WALLET:[], ACC:[]};
   var PRICE_OPTS = ["싸다","적당하다","비싸다"];
-  var SALES_OPTS = ["낮다","보통","높다"];
+  var SALES_OPTS = ["매우 낮다","낮다","높다","매우 높다"];
+  var SIZE_OPTS = ["작다","적당하다","크다"];
   var gender = null, age = null;
   var currentPage = 1;
   var DRAFT_KEY = "27fwPumpyeongDraft";
@@ -774,7 +775,7 @@
     if (prev.length === list.length) return;
     var next = [];
     for (var i=0;i<list.length;i++){
-      next[i] = prev[i] || {priceRating:null, salesRating:null, comment:""};
+      next[i] = prev[i] || {priceRating:null, salesRating:null, sizeRating:null, comment:""};
     }
     evalData[cat] = next;
   }
@@ -834,6 +835,11 @@
             + '<div class="evalrow-field"><span class="evalrow-label">판매성</span><div class="segmented small">'
               + SALES_OPTS.map(function(v){
                   return '<button type="button" class="segbtn small" data-kind="sales" data-cat="'+cat+'" data-idx="'+idx+'" data-val="'+v+'" aria-pressed="'+(ev.salesRating===v)+'">'+v+'</button>';
+                }).join('')
+              + '</div></div>'
+            + '<div class="evalrow-field"><span class="evalrow-label">크기</span><div class="segmented small">'
+              + SIZE_OPTS.map(function(v){
+                  return '<button type="button" class="segbtn small" data-kind="size" data-cat="'+cat+'" data-idx="'+idx+'" data-val="'+v+'" aria-pressed="'+(ev.sizeRating===v)+'">'+v+'</button>';
                 }).join('')
               + '</div></div>'
           + '</div>'
@@ -933,7 +939,8 @@
         var c = this.dataset.cat, idx = Number(this.dataset.idx), kind = this.dataset.kind, val = this.dataset.val;
         var ev = evalData[c][idx];
         if (kind === "price") ev.priceRating = (ev.priceRating === val) ? null : val;
-        else ev.salesRating = (ev.salesRating === val) ? null : val;
+        else if (kind === "sales") ev.salesRating = (ev.salesRating === val) ? null : val;
+        else ev.sizeRating = (ev.sizeRating === val) ? null : val;
         renderCategoryBlock(c);
         renderSubmitState();
       };
@@ -954,9 +961,10 @@
     ensureEvalData(cat);
     SAMPLES[cat].forEach(function(_, idx){
       var ev = evalData[cat][idx];
-      total += 2;
+      total += 3;
       if (ev.priceRating) done++;
       if (ev.salesRating) done++;
+      if (ev.sizeRating) done++;
     });
     return {done: done, total: total};
   }
@@ -1028,7 +1036,7 @@
       });
       doc[cat.toLowerCase()+"Eval"] = SAMPLES[cat].map(function(s, idx){
         var ev = evalData[cat][idx];
-        return {name: s.name, price: s.price, priceRating: ev.priceRating, salesRating: ev.salesRating, comment: ev.comment || ""};
+        return {name: s.name, price: s.price, priceRating: ev.priceRating, salesRating: ev.salesRating, sizeRating: ev.sizeRating, comment: ev.comment || ""};
       });
     });
     return doc;
@@ -1069,7 +1077,7 @@
         }).join("\n") || "(선택 없음)";
 
         var evalLines = (catDoc[cat.toLowerCase()+"Eval"] || []).map(function(it, i){
-          return (i+1) + ". " + it.name + " (" + fmtWon(it.price) + ") - 가격:" + (it.priceRating||"-") + " / 판매성:" + (it.salesRating||"-")
+          return (i+1) + ". " + it.name + " (" + fmtWon(it.price) + ") - 가격:" + (it.priceRating||"-") + " / 판매성:" + (it.salesRating||"-") + " / 크기:" + (it.sizeRating||"-")
             + (it.comment ? "\n   의견: " + it.comment : "");
         }).join("\n") || "(없음)";
 
@@ -1101,6 +1109,7 @@
               rank: rankPos === -1 ? "" : (rankPos + 1),
               priceRating: it.priceRating || "",
               salesRating: it.salesRating || "",
+              sizeRating: it.sizeRating || "",
               comment: it.comment || ""
             };
           });
@@ -1321,7 +1330,7 @@
       });
       evalNamesByCat[cat] = names;
       names.forEach(function(name){
-        header.push(name+" 가격평가", name+" 판매성평가", name+" 의견");
+        header.push(name+" 가격평가", name+" 판매성평가", name+" 크기평가", name+" 의견");
       });
     });
     header.push("제출일시");
@@ -1343,6 +1352,7 @@
           var it = evalList.filter(function(e){ return e.name === name; })[0];
           row.push(it ? (it.priceRating||"") : "");
           row.push(it ? (it.salesRating||"") : "");
+          row.push(it ? (it.sizeRating||"") : "");
           row.push(it ? (it.comment||"") : "");
         });
       });
