@@ -185,8 +185,6 @@
     font-size:20px;font-weight:800;font-family:"Gothic A1","Malgun Gothic",sans-serif;line-height:1.3;
   }
   .group-badge-count{font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:600;opacity:.85;}
-  .subgroup-head{display:flex;align-items:baseline;gap:8px;margin:14px 0 8px;}
-  .subgroup-head h4{font-size:13px;color:var(--ink-muted);font-weight:700;}
   .evalrow-scroll{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding-bottom:10px;}
   .evalrow-scroll .evalrow{border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--surface-2);min-width:0;}
   .evalrow-scroll .evalrow:last-child{border-bottom:1px solid var(--line);padding-bottom:12px;}
@@ -854,27 +852,18 @@
         + '</div>';
     }
 
-    function distBucket(dist){
-      if (dist === "전체") return "전체";
-      if (dist === "오프라인단독") return "오프라인";
-      if (dist === "무신사단독" || dist === "W컨셉단독" || dist === "29CM단독" || dist === "카카오단독") return "온라인";
-      return "기타";
-    }
-
     var DESC_GROUPS = ["무제", "온라인단독", "아이캐칭"];
-    var DIST_BUCKETS = ["전체", "온라인", "오프라인", "기타"];
     var groups = {};
     DESC_GROUPS.forEach(function(g){
-      groups[g] = {"전체":[], "온라인":[], "오프라인":[], "기타":[]};
+      groups[g] = [];
     });
     list.forEach(function(s, idx){
       var g = (s.description === "온라인단독" || s.description === "아이캐칭") ? s.description : "무제";
-      groups[g][distBucket(s.distribution)].push(idx);
+      groups[g].push(idx);
     });
 
-    function renderSection(title, idxs){
-      var out = '<div class="subgroup-head"><h4>'+escapeHtml(title)+'</h4><span class="cat-count">'+idxs.length+'개</span></div>';
-      out += '<div class="evalrow-scroll">';
+    function renderItems(idxs){
+      var out = '<div class="evalrow-scroll">';
       idxs.forEach(function(idx){ out += buildEvalRowHtml(list[idx], idx); });
       out += '</div>';
       return out;
@@ -883,15 +872,13 @@
     html += '<div class="evallist">';
     var firstBlockRendered = false;
     DESC_GROUPS.forEach(function(g){
-      var total = DIST_BUCKETS.reduce(function(sum,b){ return sum + groups[g][b].length; }, 0);
+      var total = groups[g].length;
       if (!total) return;
       if (g !== "무제") {
         html += '<div class="group-head'+(firstBlockRendered?'':' first')+'"><div class="tag group-badge '+descriptionTagClass(g)+'">'+escapeHtml(g)+'<span class="group-badge-count">'+total+'개</span></div></div>';
       }
       firstBlockRendered = true;
-      DIST_BUCKETS.forEach(function(b){
-        if (groups[g][b].length) html += renderSection(b, groups[g][b]);
-      });
+      html += renderItems(groups[g]);
     });
     html += '</div>';
 
