@@ -173,8 +173,9 @@
   .pickcard-price{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--ink-muted);margin-top:2px;}
   .pick-hint{font-size:12px;color:var(--ink-muted);margin-top:8px;}
 
-  .cat-subhead{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap;margin:18px 0 4px;padding-top:14px;border-top:1px solid var(--line);}
-  .cat-subhead h3{font-size:15.5px;font-family:"Gothic A1","Malgun Gothic",sans-serif;font-weight:700;}
+  .cat-subhead{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:18px 0 4px;padding-top:14px;border-top:1px solid var(--line);}
+  .cat-subhead h3{font-size:22px;font-family:"Gothic A1","Malgun Gothic",sans-serif;font-weight:700;}
+  .cat-subhead .rank-count{font-family:"IBM Plex Mono",monospace;font-size:16px;color:var(--ink-muted);}
 
   .evallist{display:flex;flex-direction:column;gap:0;margin-top:10px;}
   .group-head{margin:26px 0 14px;padding-top:18px;border-top:2px solid var(--line-strong);}
@@ -883,7 +884,7 @@
     html += '</div>';
 
     html += '<div class="cat-subhead"><h3>BEST RANKING</h3>'
-      + '<span class="cat-count">'+need+'순위까지 선택</span></div>';
+      + '<span class="rank-count">'+need+'순위까지 선택</span></div>';
     html += '<div class="pickgrid">';
     list.forEach(function(s, idx){
       var rankPos = formRanks[cat].indexOf(String(idx));
