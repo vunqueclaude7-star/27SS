@@ -195,7 +195,6 @@
   .evalrow-scroll .evalrow-tags,
   .evalrow-scroll .evalrow-head{margin-left:0;}
   .evalrow-scroll .evalrow-name{font-size:13.5px;min-width:0;}
-  .evalrow-scroll .evalrow-price{font-size:12px;white-space:nowrap;}
   @media (max-width:900px){
     .evalrow-scroll{grid-template-columns:repeat(2,minmax(0,1fr));}
   }
@@ -203,7 +202,6 @@
     .evalrow-scroll{grid-template-columns:1fr;gap:10px;}
     .evalrow-scroll .evalrow{padding:14px;}
     .evalrow-scroll .evalrow-name{font-size:16px;}
-    .evalrow-scroll .evalrow-price{font-size:14px;}
     .evalrow-scroll .evalrow-imgwrap{max-width:220px;margin:0 auto;}
   }
   .evalrow{display:flex;flex-direction:column;gap:10px;padding:14px 0;border-bottom:1px solid var(--line);}
@@ -221,13 +219,12 @@
   .tag-yellow{color:var(--brass);background:var(--brass-soft);border-color:var(--brass);}
   .evalrow-num{flex:0 0 auto;width:22px;height:22px;border-radius:50%;background:var(--surface-2);border:1px solid var(--line-strong);color:var(--ink-muted);display:flex;align-items:center;justify-content:center;font-family:"IBM Plex Mono",monospace;font-weight:700;font-size:12px;transform:translateY(1px);}
   .evalrow-name{font-weight:600;font-size:17px;}
-  .evalrow-price{font-family:"IBM Plex Mono",monospace;font-size:17px;color:var(--accent);font-weight:700;}
   .evalrow-body{display:flex;gap:12px;align-items:flex-end;}
   .evalrow-imgwrap{width:200px;max-width:200px;flex:0 0 auto;display:flex;flex-direction:column;gap:4px;}
   .evalrow-image{width:100%;aspect-ratio:1/1;border-radius:12px;overflow:hidden;background:var(--surface-2);border:1px solid var(--line-strong);display:flex;align-items:center;justify-content:center;}
   .evalrow-image img{width:100%;height:100%;object-fit:cover;}
   .evalrow-image .noimg{font-size:10px;color:var(--ink-muted);text-align:center;padding:4px;}
-  .evalrow-imgprice{font-family:"IBM Plex Mono",monospace;font-size:14px;color:var(--accent);font-weight:700;text-align:center;}
+  .evalrow-imgprice{font-family:"IBM Plex Mono",monospace;font-size:14px;color:var(--accent);font-weight:700;text-align:center;background:var(--accent-soft);border:1px solid var(--accent);border-radius:8px;padding:5px 8px;}
   .evalrow-ratings{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px;}
   .evalrow-field{display:flex;flex-direction:column;gap:5px;}
   .evalrow-label{font-size:12.5px;color:var(--ink-muted);font-weight:600;}
@@ -826,7 +823,7 @@
           ) : '')
         + '<div class="evalrow-head">'
           + '<span class="evalrow-num">'+(idx+1)+'</span>'
-          + '<div class="evalrow-name">'+escapeHtml(s.name)+' <span class="evalrow-price">('+fmtWon(s.price)+')</span></div>'
+          + '<div class="evalrow-name">'+escapeHtml(s.name)+'</div>'
         + '</div>'
         + '<div class="evalrow-body">'
           + '<div class="evalrow-imgwrap">'
