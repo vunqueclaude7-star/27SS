@@ -191,7 +191,7 @@
   .evalrow-scroll .evalrow{border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--surface-2);min-width:0;}
   .evalrow-scroll .evalrow:last-child{border-bottom:1px solid var(--line);padding-bottom:12px;}
   .evalrow-scroll .evalrow-body{flex-direction:column;align-items:stretch;}
-  .evalrow-scroll .evalrow-image{width:100%;max-width:100%;align-self:center;}
+  .evalrow-scroll .evalrow-imgwrap{width:100%;max-width:100%;align-self:center;}
   .evalrow-scroll .evalrow-tags,
   .evalrow-scroll .evalrow-head{margin-left:0;}
   .evalrow-scroll .evalrow-name{font-size:13.5px;min-width:0;}
@@ -204,7 +204,7 @@
     .evalrow-scroll .evalrow{padding:14px;}
     .evalrow-scroll .evalrow-name{font-size:16px;}
     .evalrow-scroll .evalrow-price{font-size:14px;}
-    .evalrow-scroll .evalrow-image{max-width:220px;margin:0 auto;}
+    .evalrow-scroll .evalrow-imgwrap{max-width:220px;margin:0 auto;}
   }
   .evalrow{display:flex;flex-direction:column;gap:10px;padding:14px 0;border-bottom:1px solid var(--line);}
   .evalrow:first-child{padding-top:0;}
@@ -223,9 +223,11 @@
   .evalrow-name{font-weight:600;font-size:17px;}
   .evalrow-price{font-family:"IBM Plex Mono",monospace;font-size:17px;color:var(--accent);font-weight:700;}
   .evalrow-body{display:flex;gap:12px;align-items:flex-end;}
-  .evalrow-image{width:200px;max-width:200px;flex:0 0 auto;aspect-ratio:1/1;border-radius:12px;overflow:hidden;background:var(--surface-2);border:1px solid var(--line-strong);display:flex;align-items:center;justify-content:center;}
+  .evalrow-imgwrap{width:200px;max-width:200px;flex:0 0 auto;display:flex;flex-direction:column;gap:4px;}
+  .evalrow-image{width:100%;aspect-ratio:1/1;border-radius:12px;overflow:hidden;background:var(--surface-2);border:1px solid var(--line-strong);display:flex;align-items:center;justify-content:center;}
   .evalrow-image img{width:100%;height:100%;object-fit:cover;}
   .evalrow-image .noimg{font-size:10px;color:var(--ink-muted);text-align:center;padding:4px;}
+  .evalrow-imgprice{font-family:"IBM Plex Mono",monospace;font-size:14px;color:var(--accent);font-weight:700;text-align:center;}
   .evalrow-ratings{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px;}
   .evalrow-field{display:flex;flex-direction:column;gap:5px;}
   .evalrow-label{font-size:12.5px;color:var(--ink-muted);font-weight:600;}
@@ -376,7 +378,7 @@
     .brandrow h1{font-size:22px;}
     .evalrow-body{flex-direction:column;}
     .evalrow-ratings{width:100%;}
-    .evalrow-image{align-self:center;}
+    .evalrow-imgwrap{align-self:center;}
   }
 </style>
 
@@ -827,7 +829,10 @@
           + '<div class="evalrow-name">'+escapeHtml(s.name)+' <span class="evalrow-price">('+fmtWon(s.price)+')</span></div>'
         + '</div>'
         + '<div class="evalrow-body">'
-          + '<div class="evalrow-image">'+(s.image ? '<img src="'+s.image+'" alt="">' : '<span class="noimg">이미지 없음</span>')+'</div>'
+          + '<div class="evalrow-imgwrap">'
+            + '<div class="evalrow-image">'+(s.image ? '<img src="'+s.image+'" alt="">' : '<span class="noimg">이미지 없음</span>')+'</div>'
+            + '<div class="evalrow-imgprice">'+fmtWon(s.price)+'</div>'
+          + '</div>'
           + '<div class="evalrow-ratings">'
             + '<div class="evalrow-field"><span class="evalrow-label">가격</span><div class="segmented small">'
               + PRICE_OPTS.map(function(v){
