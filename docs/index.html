@@ -322,6 +322,8 @@
   .samplerow-header{display:flex;align-items:flex-start;gap:10px;}
   .samplerow-header .samplerow-actions{margin-left:auto;}
   .srow-num{flex:0 0 auto;width:22px;height:22px;border-radius:50%;background:var(--surface-2);border:1px solid var(--line-strong);color:var(--ink-muted);display:flex;align-items:center;justify-content:center;font-family:"IBM Plex Mono",monospace;font-weight:700;font-size:12px;margin-top:4px;}
+  .srow-num-input{flex:0 0 auto;width:34px;height:24px;border-radius:7px;background:var(--surface-2);border:1px solid var(--line-strong);color:var(--ink);text-align:center;font-family:"IBM Plex Mono",monospace;font-weight:700;font-size:12.5px;margin-top:3px;padding:0 2px;}
+  .srow-num-input:focus{outline:2px solid var(--accent);outline-offset:1px;}
   .samplerow-actions{display:flex;align-items:center;gap:6px;flex:0 0 auto;}
   .samplerow .simg{
     width:88px;height:88px;border-radius:10px;overflow:hidden;flex:0 0 auto;
@@ -1489,7 +1491,7 @@
     wrap.innerHTML = list.map(function(s, idx){
       return '<div class="samplerow">'
         + '<div class="samplerow-header">'
-          + '<span class="srow-num">'+(idx+1)+'</span>'
+          + '<input type="number" class="srow-num-input" data-idx="'+idx+'" data-action="reorder" value="'+(idx+1)+'" min="1" max="'+list.length+'" title="순번 입력으로 이동">'
           + '<label class="simg" title="사진 변경">'
             + (s.image ? '<img src="'+s.image+'" alt="">' : '<span class="noimg">사진<br>추가</span>')
             + '<input type="file" accept="image/*" data-idx="'+idx+'" data-action="image" style="display:none">'
@@ -1541,6 +1543,26 @@
         var arr = SAMPLES[adminCat];
         if (swapWith < 0 || swapWith >= arr.length) return;
         var tmp = arr[idx]; arr[idx] = arr[swapWith]; arr[swapWith] = tmp;
+        renderAdminList();
+        renderCategoryBlock(adminCat);
+        renderSubmitState();
+      };
+    });
+    Array.prototype.forEach.call(wrap.querySelectorAll("input[data-action='reorder']"), function(input){
+      input.onkeydown = function(e){
+        if (e.key === "Enter"){ this.blur(); }
+      };
+      input.onchange = function(){
+        var idx = Number(this.dataset.idx);
+        var arr = SAMPLES[adminCat];
+        var target = Math.round(Number(this.value));
+        if (!target || isNaN(target)) target = idx + 1;
+        target = Math.max(1, Math.min(arr.length, target));
+        var newIdx = target - 1;
+        if (newIdx !== idx){
+          var item = arr.splice(idx, 1)[0];
+          arr.splice(newIdx, 0, item);
+        }
         renderAdminList();
         renderCategoryBlock(adminCat);
         renderSubmitState();
