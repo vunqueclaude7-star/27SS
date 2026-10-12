@@ -777,7 +777,7 @@
     if (prev.length === list.length) return;
     var next = [];
     for (var i=0;i<list.length;i++){
-      next[i] = prev[i] || {priceRating:null, salesRating:null, sizeRating:null, comment:""};
+      next[i] = prev[i] || {priceRating:null, salesRating:null, sizeRating:null, customAnswer:null, comment:""};
     }
     evalData[cat] = next;
   }
@@ -846,6 +846,13 @@
                   return '<button type="button" class="starbtn'+(on?' filled':'')+'" data-kind="sales" data-cat="'+cat+'" data-idx="'+idx+'" data-val="'+n+'" aria-pressed="'+(ev.salesRating===n)+'" aria-label="'+n+'점">&#9733;</button>';
                 }).join('')
               + '</div></div>'
+            + (s.question ? (
+                '<div class="evalrow-field"><span class="evalrow-label">'+escapeHtml(s.question)+'</span><div class="segmented small">'
+                  + [s.optA||"예", s.optB||"아니오"].map(function(v){
+                      return '<button type="button" class="segbtn small" data-kind="custom" data-cat="'+cat+'" data-idx="'+idx+'" data-val="'+escapeHtml(v)+'" aria-pressed="'+(ev.customAnswer===v)+'">'+escapeHtml(v)+'</button>';
+                    }).join('')
+                  + '</div></div>'
+              ) : '')
           + '</div>'
         + '</div>'
         + '<label class="evalrow-comment-label">의견'
@@ -927,6 +934,7 @@
           var n = Number(val);
           ev.salesRating = (ev.salesRating === n) ? null : n;
         }
+        else if (kind === "custom") ev.customAnswer = (ev.customAnswer === val) ? null : val;
         else ev.sizeRating = (ev.sizeRating === val) ? null : val;
         renderCategoryBlock(c);
         renderSubmitState();
@@ -946,12 +954,16 @@
     var total = need, done = 0;
     formRanks[cat].forEach(function(v){ if (v) done++; });
     ensureEvalData(cat);
-    SAMPLES[cat].forEach(function(_, idx){
+    SAMPLES[cat].forEach(function(s, idx){
       var ev = evalData[cat][idx];
       total += 3;
       if (ev.priceRating) done++;
       if (ev.salesRating) done++;
       if (ev.sizeRating) done++;
+      if (s.question) {
+        total += 1;
+        if (ev.customAnswer) done++;
+      }
     });
     return {done: done, total: total};
   }
@@ -1023,7 +1035,7 @@
       });
       doc[cat.toLowerCase()+"Eval"] = SAMPLES[cat].map(function(s, idx){
         var ev = evalData[cat][idx];
-        return {name: s.name, price: s.price, priceRating: ev.priceRating, salesRating: ev.salesRating, sizeRating: ev.sizeRating, comment: ev.comment || ""};
+        return {name: s.name, price: s.price, priceRating: ev.priceRating, salesRating: ev.salesRating, sizeRating: ev.sizeRating, question: s.question || "", customAnswer: ev.customAnswer || "", comment: ev.comment || ""};
       });
     });
     return doc;
@@ -1065,6 +1077,7 @@
 
         var evalLines = (catDoc[cat.toLowerCase()+"Eval"] || []).map(function(it, i){
           return (i+1) + ". " + it.name + " (" + fmtWon(it.price) + ") - 가격:" + (it.priceRating||"-") + " / 판매성:" + (it.salesRating ? it.salesRating+"/4" : "-") + " / 크기:" + (it.sizeRating||"-")
+            + (it.question ? "\n   " + it.question + ": " + (it.customAnswer||"-") : "")
             + (it.comment ? "\n   의견: " + it.comment : "");
         }).join("\n") || "(없음)";
 
@@ -1097,6 +1110,8 @@
               priceRating: it.priceRating || "",
               salesRating: it.salesRating || "",
               sizeRating: it.sizeRating || "",
+              question: it.question || "",
+              customAnswer: it.customAnswer || "",
               comment: it.comment || ""
             };
           });
@@ -1317,7 +1332,7 @@
       });
       evalNamesByCat[cat] = names;
       names.forEach(function(name){
-        header.push(name+" 가격평가", name+" 판매성평가", name+" 크기평가", name+" 의견");
+        header.push(name+" 가격평가", name+" 판매성평가", name+" 크기평가", name+" 추가질문답변", name+" 의견");
       });
     });
     header.push("제출일시");
@@ -1340,6 +1355,7 @@
           row.push(it ? (it.priceRating||"") : "");
           row.push(it ? (it.salesRating||"") : "");
           row.push(it ? (it.sizeRating||"") : "");
+          row.push(it ? (it.customAnswer||"") : "");
           row.push(it ? (it.comment||"") : "");
         });
       });
@@ -1461,7 +1477,7 @@
   }
 
   document.getElementById("btnAddSample").onclick = function(){
-    SAMPLES[adminCat].push({name:"", price:0, image:null, distribution:"", description:""});
+    SAMPLES[adminCat].push({name:"", price:0, image:null, distribution:"", description:"", question:"", optA:"", optB:""});
     renderAdminList();
     renderCategoryBlock(adminCat);
     renderSubmitState();
@@ -1509,6 +1525,11 @@
         + '<div class="samplerow-extra">'
           + '<input type="text" data-idx="'+idx+'" data-field="distribution" list="distributionOptions" placeholder="유통 선택 또는 입력" value="'+escapeHtml(s.distribution||"")+'">'
           + '<input type="text" data-idx="'+idx+'" data-field="description" list="descriptionOptions" placeholder="무제/온라인단독/아이캐칭 선택 또는 입력" value="'+escapeHtml(s.description||"")+'">'
+        + '</div>'
+        + '<div class="samplerow-extra">'
+          + '<input type="text" data-idx="'+idx+'" data-field="question" placeholder="궁금한 질문 (선택사항, 입력 시 품평 화면에 2지선다 질문 추가)" value="'+escapeHtml(s.question||"")+'" style="flex:2;min-width:220px;">'
+          + '<input type="text" data-idx="'+idx+'" data-field="optA" placeholder="선택지1 (기본: 예)" value="'+escapeHtml(s.optA||"")+'">'
+          + '<input type="text" data-idx="'+idx+'" data-field="optB" placeholder="선택지2 (기본: 아니오)" value="'+escapeHtml(s.optB||"")+'">'
         + '</div>'
         + '</div>';
     }).join("");
