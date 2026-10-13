@@ -819,6 +819,7 @@
       return '<div class="evalrow">'
         + '<div class="evalrow-tags">'
           + (s.distribution ? '<span class="tag '+distributionTagClass(s.distribution)+'">'+escapeHtml(s.distribution)+'</span>' : '')
+          + (s.description === "아이캐칭" ? '<span class="tag '+descriptionTagClass(s.description)+'">아이캐칭</span>' : '')
         + '</div>'
         + '<div class="evalrow-head">'
           + '<span class="evalrow-num">'+(idx+1)+'</span>'
@@ -861,16 +862,6 @@
         + '</div>';
     }
 
-    var DESC_GROUPS = ["무제", "온라인단독", "아이캐칭"];
-    var groups = {};
-    DESC_GROUPS.forEach(function(g){
-      groups[g] = [];
-    });
-    list.forEach(function(s, idx){
-      var g = (s.description === "온라인단독" || s.description === "아이캐칭") ? s.description : "무제";
-      groups[g].push(idx);
-    });
-
     function renderItems(idxs){
       var out = '<div class="evalrow-scroll">';
       idxs.forEach(function(idx){ out += buildEvalRowHtml(list[idx], idx); });
@@ -879,16 +870,7 @@
     }
 
     html += '<div class="evallist">';
-    var firstBlockRendered = false;
-    DESC_GROUPS.forEach(function(g){
-      var total = groups[g].length;
-      if (!total) return;
-      if (g !== "무제") {
-        html += '<div class="group-head'+(firstBlockRendered?'':' first')+'"><div class="tag group-badge '+descriptionTagClass(g)+'">'+escapeHtml(g)+'<span class="group-badge-count">'+total+'개</span></div></div>';
-      }
-      firstBlockRendered = true;
-      html += renderItems(groups[g]);
-    });
+    html += renderItems(list.map(function(s, idx){ return idx; }));
     html += '</div>';
 
     html += '<div class="cat-subhead"><h3>BEST RANKING</h3>'
